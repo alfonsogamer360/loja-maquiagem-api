@@ -1,24 +1,18 @@
 import { pool } from "../database/db.js";
 
-export class serviceProduto{
+export class serviceProduto {
+  async listarTodas() {
+    const result = await pool.query('SELECT * FROM produtos');
+    return result.rows;
+  }
 
-  async getall() {
-   
-      const result = await pool.query(
-        'SELECT id, nome, categoria, condicao_uso, disponivel FROM equipamentos ORDER BY nome'
-      )
-      return result.rows
-    
-}
-  async criar(equipamento) {
-    const { nome, categoria, condicao_uso = 'Bom estado', disponivel = false } = equipamento
-
-    const result = await pool.query(
-        'INSERT INTO equipamentos (nome, categoria, condicao_uso, disponivel) VALUES ($1, $2, $3, $4) RETURNING id, nome, categoria, condicao_uso, disponivel',
-        [nome, categoria, condicao_uso, disponivel]
-      )
-      return result.rows[0] 
+  async criar({ nome, marca, categoria, preco, quantidade_estoque }) {
+    const res = await pool.query(
+      'INSERT INTO produtos (nome, marca, categoria, preco, quantidade_estoque) VALUES ($1, $2, $3, $4, $5) RETURNING *',
+      [nome, marca, categoria, preco, quantidade_estoque]
+    );
+    return res.rows[0];
   }
 }
 
-export default new EquipamentoService()
+export default new serviceProduto();
